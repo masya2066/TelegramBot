@@ -37,7 +37,6 @@ func (c *Client) Updates(limit int, offset int) ([]Update, error) {
 	q := url.Values{}
 	q.Add("offset", strconv.Itoa(offset))
 	q.Add("limit", strconv.Itoa(limit))
-
 	data, err := c.doRequest(getUpdatesMethod, q)
 	if err != nil {
 		return nil, err

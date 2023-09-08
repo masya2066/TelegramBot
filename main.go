@@ -13,7 +13,7 @@ import (
 
 const (
 	host        = "api.telegram.org"
-	storagePath = "storage"
+	storagePath = "files_storage"
 	batchSize   = 100
 )
 
