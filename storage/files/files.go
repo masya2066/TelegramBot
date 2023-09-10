@@ -114,6 +114,10 @@ func (s Storage) IsExists(p *storage.Page) (bool, error) {
 	return true, nil
 }
 
+func (s Storage) List(filepath string) {
+
+}
+
 func (s Storage) decodePage(filepath string) (*storage.Page, error) {
 	f, err := os.Open(filepath)
 	if err != nil {
