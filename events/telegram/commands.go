@@ -13,6 +13,7 @@ const (
 	RndCmd   = "/random"
 	HelpCmd  = "/help"
 	StartCmd = "/start"
+	ListCmd  = "/list"
 )
 
 func (p *Processor) doCmd(text string, chatID int, username string) error {
@@ -29,6 +30,8 @@ func (p *Processor) doCmd(text string, chatID int, username string) error {
 		return p.sendRandom(chatID, username)
 	case HelpCmd:
 		return p.sendHelp(chatID)
+	case ListCmd:
+		return p.sendList(chatID, username)
 	case StartCmd:
 		return p.sendHello(chatID)
 	default:
@@ -77,6 +80,20 @@ func (p *Processor) sendRandom(chatID int, username string) (err error) {
 		return err
 	}
 	return p.storage.Remove(page)
+}
+
+func (p *Processor) sendList(chatID int, username string) error {
+	list, err := p.storage.List(username)
+	if err != nil && !errors.Is(err, storage.ErrNoSavedPages) {
+		return err
+	}
+	if errors.Is(err, storage.ErrNoSavedPages) {
+		return p.tg.SendMessage(chatID, msgNoSavedPages)
+	}
+	if err := p.tg.SendMessage(chatID, msgListLinks+list); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *Processor) sendHelp(chatID int) error {

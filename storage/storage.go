@@ -13,11 +13,16 @@ type Storage interface {
 	PickRandom(userName string) (*Page, error)
 	Remove(p *Page) error
 	IsExists(p *Page) (bool, error)
+	List(userName string) (string, error)
 }
 
 type Page struct {
 	URL      string
 	UserName string
+}
+
+type Pages struct {
+	List string
 }
 
 var ErrNoSavedPages = errors.New("no saved page")

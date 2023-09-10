@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Storage struct {
@@ -114,8 +115,37 @@ func (s Storage) IsExists(p *storage.Page) (bool, error) {
 	return true, nil
 }
 
-func (s Storage) List(filepath string) {
+func (s Storage) List(userName string) (l string, err error) {
+	defer func() { err = e.WrapIfErr("can't random page", err) }()
+	path := filepath.Join(s.basePath, userName)
 
+	if _, err = os.Stat(path); os.IsNotExist(err) {
+		if err := os.MkdirAll(path, defaultPerm); err != nil {
+			return "", err
+		}
+	}
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return "", err
+	}
+
+	if len(files) == 0 {
+		return "", storage.ErrNoSavedPages
+	}
+
+	var decodedFiles []string
+
+	for i := 0; i < len(files); i++ {
+		decoded, err := s.decodePage(filepath.Join(path, files[i].Name()))
+		if err != nil {
+			return "", err
+		}
+		number := fmt.Sprintf("%d. ", i+1)
+		decodedFiles = append(decodedFiles, number+decoded.URL)
+	}
+	list := strings.Join(decodedFiles, "\n")
+
+	return list, nil
 }
 
 func (s Storage) decodePage(filepath string) (*storage.Page, error) {
